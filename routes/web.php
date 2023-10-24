@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\FollowController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
@@ -27,6 +28,9 @@ Route::post('/logout', [UserController::class, 'logout'])->middleware('mustBeLog
 Route::get('/manage-avatar', [UserController::class, 'showAvatarForm'])->middleware('mustBeLoggedIn');
 Route::post('/manage-avatar', [UserController::class, 'storeAvatar'])->middleware('mustBeLoggedIn');
 
+//Follow Related Routes
+Route::post('/follow/{user:username}', [FollowController::class, 'followUser'])->middleware('mustBeLoggedIn');
+Route::post('/unfollow/{user:username}', [FollowController::class, 'UnFollowUser'])->middleware('mustBeLoggedIn');
 
 // Blog routes
 Route::get('/create-post', [PostController::class,'showCreateForm'])->middleware('mustBeLoggedIn');
@@ -37,5 +41,6 @@ Route::get('/post/{post}/edit', [PostController::class, 'showEditForm'])->middle
 Route::put('/post/{post}', [PostController::class,'updatePost'])->middleware('mustBeLoggedIn','can:update,post');
 
 //Profile related routes
-Route::get('/profile/{userData:username}', [UserController::class,'profile'])->middleware('mustBeLoggedIn');
-// {userData:username} variable name : column name
+Route::get('/profile/{user:username}', [UserController::class, 'profile'])->middleware('mustBeLoggedIn');// {userData:username} variable name : column name
+Route::get('/profile/{user:username}/followers', [UserController::class, 'profileFollowers'])->middleware('mustBeLoggedIn');
+Route::get('/profile/{user:username}/following', [UserController::class, 'profileFollowing'])->middleware('mustBeLoggedIn');

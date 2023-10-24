@@ -22,7 +22,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        
+        //Gate
         Gate::define('visitAdminPages', function($user){
             return $user->isAdmin === 1;
         });

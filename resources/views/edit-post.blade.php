@@ -1,4 +1,4 @@
-<x-layout>
+<x-layout doctitle="Editing Post: {{$post->title}}">
     <div class="container py-md-5 container--narrow">
         <form action="/post/{{$post->id}}" method="POST">
           <p><small><a href="/post/{{ $post->id }}">&laquo; Return to the post</a></small></p>

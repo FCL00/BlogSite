@@ -56,6 +56,19 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function feedPosts() {
+        return $this->hasManyThrough(Post::class, Follow::class, 'user_id', 'user_id', 'id', 'followeduser');
+    }
+
+    public function followers(){
+        return $this->hasMany(Follow::class, 'followeduser');
+    }
+
+    public function followingTheseUser(){
+        return $this->hasMany(Follow::class, 'user_id');
+    }
+
+
     public function posts(){
         // Query using ORM or Eloquent
         return $this->hasMany(Post::class, 'user_id');

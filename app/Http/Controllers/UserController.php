@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Follow;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\View;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
@@ -14,7 +16,7 @@ class UserController extends Controller
     public function showHomePage(){
 
         if(auth()->check()){
-            return view("homePageFeed");
+            return view("homePageFeed", ['posts' => auth()->user()->feedPosts()->latest()->paginate(5)]);
         } else{
             return view("homePage");
         }
@@ -55,18 +57,39 @@ class UserController extends Controller
         // $incomingData['password'] = bcrypt($incomingData['password']);
     }
 
-    public function profile(User $userData){
-        //type hinting User $userData makes the $userData the instance of User class
-        
-        return view("profile-post", ["username" => $userData->username, 
-                    "posts" => $userData->posts()->latest()->get(), 
-                    "postCount" => $userData->posts()->count(), 
-                    "avatar" => $userData->avatar
-                ]);
-        // $userData->posts()->latest()->get() will get all the post and sorted in lastest order
-        // $userData->posts()->count() will count all the post created by the user
-        // $userData->avatar() get the profile picture of the owner of the post
+    private function getSharedData($user) {
+        $currentlyFollowing = 0;
+
+        if (auth()->check()) {
+            $currentlyFollowing = Follow::where([['user_id', '=', auth()->user()->id], ['followeduser', '=', $user->id]])->count();
+        }
+
+        View::share('sharedData', ['currentlyFollowing' => $currentlyFollowing, 
+                                    'avatar' => $user->avatar, 
+                                    'username' => $user->username, 
+                                    'postCount' => $user->posts()->count(),
+                                    'followerCount' => $user->followers()->count(),
+                                    'followingCount' => $user->followingTheseUser()->count()
+                                ]);
     }
+ 
+    public function profile(User $user) {
+        $this->getSharedData($user);
+        return view('profile-post', ['posts' => $user->posts()->latest()->get()]);
+    }
+
+    public function profileFollowers(User $user) {
+        $this->getSharedData($user);
+        return view('profile-followers', ['followers' => $user->followers()->latest()->get()]);
+    }
+
+    public function profileFollowing(User $user) {
+        $this->getSharedData($user);
+        return view('profile-following', ['following' => $user->followingTheseUser()->latest()->get()]);
+    }
+
+
+    
 
     public function showAvatarForm(){
         return view("avatar-form");
@@ -111,3 +134,24 @@ class UserController extends Controller
         // uses composer require intervention/image a package to resize the image
     }
 }
+
+
+
+//-----------------------------------------------------------------
+   // public function profile(User $userData){
+    //     //type hinting User $userData makes the $userData the instance of User class
+    //     $currentlyFollowing=0;
+    //     if( auth()->check()){
+    //         $currentlyFollowing =  Follow::where([["user_id", "=" , auth()->user()->id], ["followeduser", "=", $userData->id ]])->count();
+    //     }
+
+    //     return view("profile-post", ["username" => $userData->username, 
+    //                 "posts" => $userData->posts()->latest()->get(), 
+    //                 "postCount" => $userData->posts()->count(), 
+    //                 "avatar" => $userData->avatar,
+    //                 "currentlyFollowing"=> $currentlyFollowing
+    //             ]);
+    //     // $userData->posts()->latest()->get() will get all the post and sorted in lastest order
+    //     // $userData->posts()->count() will count all the post created by the user
+    //     // $userData->avatar() get the profile picture of the owner of the post
+    // }
