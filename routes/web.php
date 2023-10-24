@@ -39,6 +39,7 @@ Route::get('/post/{postId}', [PostController::class,'viewSinglePost'])->middlewa
 Route::delete('/post/{post}', [PostController::class,'delete'])->middleware('mustBeLoggedIn', 'can:delete,post'); //middleware and policy check if the user can delete the post
 Route::get('/post/{post}/edit', [PostController::class, 'showEditForm'])->middleware('mustBeLoggedIn', 'can:update,post'); //middleware and policy check if the user can update the post
 Route::put('/post/{post}', [PostController::class,'updatePost'])->middleware('mustBeLoggedIn','can:update,post');
+Route::get('/search/{term}', [PostController::class,'search'])->middleware('mustBeLoggedIn');
 
 //Profile related routes
 Route::get('/profile/{user:username}', [UserController::class, 'profile'])->middleware('mustBeLoggedIn');// {userData:username} variable name : column name

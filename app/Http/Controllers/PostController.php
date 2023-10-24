@@ -64,4 +64,16 @@ class PostController extends Controller
         return back()->with('success','Post Successfully Updated');
     }
 
+
+    public function search($term){
+
+        $post  = Post::search($term)->get();
+        $post->load('user:id,username,avatar'); // include the id username and avatar
+        return $post;
+        // use the search library build by laravel 
+        // composer require laravel/scout
+        // to use scout: php artisan vendor:publish --provider="Laravel\Scout\ScoutServiceProvider"
+        // Post model i added Searchable and created a function called toSearchableArray
+        // In .env file add this SCOUT_DRIVER=database
+    }
 }
