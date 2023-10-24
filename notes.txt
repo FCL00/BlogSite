@@ -1,0 +1,7 @@
+This blog website uses pusher driver for chat
+composer require pusher/pusher-php-server
+
+uncomment the line 18 to end in bootstrap.js
+
+import this:
+npm install laravel-echo pusher-js

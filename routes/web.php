@@ -1,10 +1,12 @@
 <?php
 
+use App\Events\ChatMessage;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FollowController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,3 +47,18 @@ Route::get('/search/{term}', [PostController::class,'search'])->middleware('must
 Route::get('/profile/{user:username}', [UserController::class, 'profile'])->middleware('mustBeLoggedIn');// {userData:username} variable name : column name
 Route::get('/profile/{user:username}/followers', [UserController::class, 'profileFollowers'])->middleware('mustBeLoggedIn');
 Route::get('/profile/{user:username}/following', [UserController::class, 'profileFollowing'])->middleware('mustBeLoggedIn');
+
+// Chat route
+Route::post('/send-chat-message', function (Request $request) {
+    $formFields = $request->validate([
+      'textvalue' => 'required'
+    ]);
+  
+    if (!trim(strip_tags($formFields['textvalue']))) {
+      return response()->noContent();
+    }
+  
+    broadcast(new ChatMessage(['username' =>auth()->user()->username, 'textvalue' => strip_tags($request->textvalue), 'avatar' => auth()->user()->avatar]))->toOthers();
+    return response()->noContent();
+  
+  })->middleware('mustBeLoggedIn');
